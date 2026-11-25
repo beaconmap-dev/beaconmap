@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="beaconmap" content="1">
+  <title>BeaconMap</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='5' fill='%2340e0ff'/><circle cx='16' cy='16' r='11' fill='none' stroke='%2340e0ff' stroke-width='2' opacity='.5'/></svg>">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="globe" aria-label="Globe showing your computer's network connections"></div>
+  <canvas id="flat" class="hidden" aria-label="Flat map showing your computer's network connections"></canvas>
+  <div id="flat-tip" class="hidden"></div>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="beacon-dot" aria-hidden="true"></span>
+      <span class="brand-name">Beacon<b>Map</b></span>
+      <span id="live" class="live off" title="Connection to the local collector">offline</span>
+    </div>
+    <div class="stats" id="stats">
+      <div class="stat"><b id="s-conn">0</b><span>connections</span></div>
+      <div class="stat"><b id="s-co">0</b><span>companies</span></div>
+      <div class="stat"><b id="s-cc">0</b><span>countries</span></div>
+      <div class="stat"><b id="s-apps">0</b><span>apps</span></div>
+      <div class="stat" id="stat-bad"><b id="s-bad">—</b><span>known-bad</span></div>
+    </div>
+    <div class="top-actions">
+      <button id="btn-view" class="icon-btn" title="Switch to the flat map" aria-label="Switch between globe and flat map">🗺</button>
+      <button id="btn-share" class="icon-btn" title="Save the globe as an image" aria-label="Save the globe as an image">⤓</button>
+      <button id="btn-theme" class="icon-btn" title="Switch light / dark" aria-label="Switch light or dark mode">☀</button>
+      <button id="btn-panel" class="icon-btn" title="Toggle list" aria-label="Toggle list">☰</button>
+      <button id="btn-settings" class="icon-btn" title="Settings" aria-label="Settings">⚙</button>
+    </div>
+  </header>
+
+  <div id="banners"></div>
+
+  <aside class="panel" id="panel">
+    <div class="panel-head">
+      <div class="tabs" role="tablist">
+        <button class="tab on" id="tab-live" role="tab">Live</button>
+        <button class="tab" id="tab-history" role="tab">History <b id="history-count"></b></button>
+      </div>
+      <input id="search" type="search" placeholder="Search app, company, country…" autocomplete="off">
+      <div class="chips" id="app-chips"></div>
+    </div>
+    <div class="scroller">
+      <div id="view-live">
+        <ul class="rows" id="rows"></ul>
+        <div class="empty" id="empty">Waiting for connections…</div>
+        <div id="recent-wrap" class="hidden">
+          <h4 class="section">Recently closed</h4>
+          <ul class="rows" id="recent"></ul>
+        </div>
+      </div>
+      <div id="view-history" class="hidden">
+        <p class="muted small history-note">Everything this computer has talked to since BeaconMap started (<span id="history-since"></span>).
+          Kept in memory only. <a href="#" id="history-clear">Clear</a></p>
+        <ul class="rows" id="history"></ul>
+        <div class="empty hidden" id="history-empty">Nothing yet.</div>
+      </div>
+    </div>
+  </aside>
+
+  <section class="details hidden" id="details" aria-live="polite"></section>
+
+  <footer class="bottombar">
+    <div class="legend">
+      <span><i class="sw sw-direct"></i>direct</span>
+      <span><i class="sw sw-cloud"></i>cloud / CDN</span>
+      <span><i class="sw sw-threat"></i>known bad</span>
+      <span class="pill hidden" id="addon-pill" title="The browser add-on is reporting website names">🧩 add-on connected</span>
+      <span class="pill" id="lan-pill" title="Devices on your own network (router, printer…) aren't shown on the globe">🏠 <b id="lan">0</b> local</span>
+    </div>
+    <div class="attrib">
+      <span>🔒 100% local — nothing leaves this computer</span>
+      <span>IP Geolocation by <a href="https://db-ip.com" target="_blank" rel="noopener">DB-IP</a> (CC BY 4.0)</span>
+    </div>
+  </footer>
+
+  <dialog id="settings">
+    <form method="dialog" class="settings-form">
+      <h2 id="settings-title">Where are you?</h2>
+      <p class="muted" id="settings-intro">BeaconMap draws arcs from your location. Pick the nearest city — it's
+        saved on this computer only and never sent anywhere.</p>
+      <div class="home-now">Home: <b id="home-current"></b></div>
+      <label>Search for your city
+        <input id="home-search" type="search" placeholder="Type a city name…" autocomplete="off">
+      </label>
+      <ul id="home-results" class="results"></ul>
+      <div class="home-buttons">
+        <button type="button" id="home-pick">Pick it on the globe</button>
+        <button type="button" id="home-precise">Use my precise location</button>
+      </div>
+      <p class="muted small">“Precise location” asks your <b>browser</b> where you are. Browsers usually work this out
+        by sending nearby Wi-Fi details to their own location service. BeaconMap only receives the answer and
+        saves it on this computer. <span id="home-precise-msg"></span></p>
+      <details>
+        <summary>Custom coordinates</summary>
+        <div class="coords">
+          <label>Lat <input id="home-lat" type="number" step="0.01" min="-90" max="90"></label>
+          <label>Lng <input id="home-lng" type="number" step="0.01" min="-180" max="180"></label>
+        </div>
+      </details>
+      <label class="check"><input type="checkbox" id="nerd"> Nerd mode (show IPs, ports, protocols, ASNs)</label>
+      <label class="check"><input type="checkbox" id="rotate"> Auto-rotate globe</label>
+      <button type="button" id="btn-addon" class="linkish">Browser add-on for website names (optional)…</button>
+      <div class="dialog-actions">
+        <button value="cancel" class="ghost" id="settings-cancel">Cancel</button>
+        <button value="save" id="settings-save" class="primary">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="addon">
+    <form method="dialog" class="settings-form">
+      <h2>Browser add-on for website names</h2>
+      <p class="muted">BeaconMap can only see which <b>company</b> owns a server. Your browser knows which
+        <b>website</b> it was for. This optional add-on passes that on, so a row like
+        “chrome → Amazon AWS” also shows the site names.</p>
+      <p class="muted"><b>What it sees:</b> the name of each website your browser loads, and the server address.
+        <b>Where it goes:</b> only to BeaconMap on this computer. It never reads page contents, full links,
+        passwords or history, and it is two short files you can read.</p>
+      <p class="muted"><b>To add it</b> (Chrome, Edge, Brave):</p>
+      <ol class="steps">
+        <li>Open <code>chrome://extensions</code> in a new tab</li>
+        <li>Turn on <b>Developer mode</b> (top right)</li>
+        <li>Click <b>Load unpacked</b> and choose this folder:<br><code id="addon-path"></code></li>
+        <li>Come back here and reload this page</li>
+      </ol>
+      <p class="muted" id="addon-status"></p>
+      <div class="dialog-actions">
+        <button value="cancel" class="primary">Close</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="share">
+    <form method="dialog" class="settings-form">
+      <h2>Save the globe as an image</h2>
+      <p class="muted">The image is made on this computer and saved to your downloads. Nothing is uploaded.
+        It shows the globe and three totals, never the list of apps.</p>
+      <label class="check"><input type="checkbox" id="share-hide" checked> Hide where I am (removes my pin and the lines, keeps the server dots)</label>
+      <div class="dialog-actions">
+        <button value="cancel" class="ghost">Cancel</button>
+        <button value="save" class="primary">Save image</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="vendor/globe.gl.min.js"></script>
+  <script src="vendor/topojson-client.min.js"></script>
+  <script src="homes.js"></script>
+  <script src="cities.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

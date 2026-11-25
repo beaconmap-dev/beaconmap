@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "beaconmap"
+version = "0.1.0"
+description = "See every server your computer talks to, live on a 3D globe. 100% local."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE", "THIRD_PARTY.md"]
+requires-python = ">=3.9"
+dependencies = [
+  "psutil>=5.9",
+  "fastapi>=0.100",
+  "uvicorn>=0.23",
+  "maxminddb>=2.4",
+  "certifi>=2023.7",
+]
+keywords = ["network", "privacy", "security", "visualization", "globe", "netstat"]
+classifiers = [
+  "Operating System :: Microsoft :: Windows",
+  "Operating System :: MacOS",
+  "Operating System :: POSIX :: Linux",
+  "Topic :: System :: Networking :: Monitoring",
+  "Topic :: Security",
+]
+
+[project.scripts]
+beaconmap = "beaconmap.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+beaconmap = ["static/*", "static/vendor/*", "extension/*"]

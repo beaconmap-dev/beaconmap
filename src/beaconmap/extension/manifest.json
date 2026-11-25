@@ -1,0 +1,16 @@
+{
+  "manifest_version": 3,
+  "name": "BeaconMap site names",
+  "version": "0.1.0",
+  "description": "Tells BeaconMap, on this computer only, which website each server address belongs to.",
+  "permissions": ["webRequest", "storage", "alarms"],
+  "host_permissions": ["<all_urls>"],
+  "background": { "service_worker": "background.js" },
+  "content_scripts": [
+    {
+      "matches": ["http://127.0.0.1/*", "http://localhost/*"],
+      "js": ["pair.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
