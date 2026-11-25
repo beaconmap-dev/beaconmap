@@ -74,8 +74,8 @@ the permission a browser requires before it reports server addresses.
 
 To add it (Chrome, Edge, Brave): open `chrome://extensions`, turn on
 **Developer mode**, click **Load unpacked**, and choose the folder shown under
-⚙ → *Browser add-on*. Then reload the BeaconMap page. It is not in the Chrome
-Web Store yet, and there is no Firefox or Safari version.
+⚙ → *Browser add-on*. Then reload the BeaconMap page. It is only available
+this way (not from the Chrome Web Store), and only for Chromium browsers.
 
 Names are kept in memory for 30 minutes and never written to disk.
 
@@ -144,7 +144,6 @@ With the optional add-on, it also receives website names from your browser.
 ## Roadmap
 
 - Tracker flags, using the website names from the add-on
-- Add-on in the Chrome Web Store, and a Firefox version
 
 ## Where the data comes from
 
