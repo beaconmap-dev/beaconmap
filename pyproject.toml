@@ -24,7 +24,16 @@ classifiers = [
   "Operating System :: POSIX :: Linux",
   "Topic :: System :: Networking :: Monitoring",
   "Topic :: Security",
+  "Programming Language :: Python :: 3",
+  "Development Status :: 4 - Beta",
+  "Environment :: Web Environment",
+  "Intended Audience :: End Users/Desktop",
 ]
+
+[project.urls]
+Homepage = "https://github.com/beaconmap-dev/beaconmap"
+Source = "https://github.com/beaconmap-dev/beaconmap"
+Issues = "https://github.com/beaconmap-dev/beaconmap/issues"
 
 [project.scripts]
 beaconmap = "beaconmap.cli:main"

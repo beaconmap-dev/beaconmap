@@ -3,12 +3,12 @@
 **See every server your computer talks to, live on a 3D globe.**
 Which app, which company, which country. 100% local.
 
-![BeaconMap: a dark globe with lines from home to each server, and a list of apps and the companies they talk to](docs/screenshot.png)
+![BeaconMap: a dark globe with lines from home to each server, and a list of apps and the companies they talk to](https://raw.githubusercontent.com/beaconmap-dev/beaconmap/main/docs/screenshot.png)
 
 ## Install and run
 
 ```
-pip install beaconmap      # not on PyPI yet: for now, clone and `pip install -e .`
+pip install beaconmap
 beaconmap
 ```
 
@@ -177,6 +177,6 @@ python -m venv .venv
 ## Credits
 
 IP Geolocation by [DB-IP](https://db-ip.com) (CC BY 4.0). Globe by
-[globe.gl](https://github.com/vasturiano/globe.gl). See [THIRD_PARTY.md](THIRD_PARTY.md).
+[globe.gl](https://github.com/vasturiano/globe.gl). See [THIRD_PARTY.md](https://github.com/beaconmap-dev/beaconmap/blob/main/THIRD_PARTY.md).
 
 MIT licensed.
